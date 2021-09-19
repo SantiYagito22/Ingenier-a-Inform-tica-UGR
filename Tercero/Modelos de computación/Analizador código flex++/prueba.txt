@@ -1,0 +1,22 @@
+if( 4%2 ){
+    for(int i = 0; i < 10; i++){
+        z += 3;
+    }
+}
+
+while(a >= 23){
+    r--;
+    h++;
+    22 % 2;
+}
+
+if( 2 != 3){
+    p += 2;
+}
+
+v.resize(3);
+v.size();
+v.clear(v_prueba);
+v.hacerFuncion("pan");
+pepito_3.que_pasa("hola");
+pepito_3.que_pasa("hola");
