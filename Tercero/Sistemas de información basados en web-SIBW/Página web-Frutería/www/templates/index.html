@@ -1,0 +1,40 @@
+{% extends "padre.html" %}
+
+         
+        {% block Estilo %}
+        <link href="css/estilos.css" rel = "stylesheet" type="text/css" />
+        {% endblock %}
+
+        
+        
+
+        {% block bloqueCambia %}
+         <div class="eventos">
+
+
+            {% for ev in eventosInicio %}
+
+                {%if ev.visible==true or datosUsuario.tipo=='gestor' or datosUsuario.tipo=='super' %}
+                <a href="evento.php?ev={{ev.id}}">
+                    <div class="item">
+                        <img class="item-img" src="{{ ev.imagen }}"/>
+                    <div class="item-text">
+                        <h3>{{ ev.tipo }}</h3>
+                        <p>{{ ev.introduccion }}</p>
+                    </div>
+                </div>
+                </a>
+                {% endif %}
+
+            {% endfor %}
+
+           
+
+           
+            
+           </div>
+           {% endblock %}
+       
+
+
+            

@@ -1,0 +1,3 @@
+rmiregistry &
+
+netstat -putona | grep :::1099 | awk '{print $7}' | cut -d '/' -f 1

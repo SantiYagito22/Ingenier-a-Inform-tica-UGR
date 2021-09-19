@@ -1,0 +1,42 @@
+<html lang="es" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Gestion Usuario</title>
+        <link href="css/gestionUsuarios.css" rel = "stylesheet" type="text/css" />
+    </head>
+
+    <body>
+        <div class="box" action="" method="post">
+            <a href="./index.php"><img class="logo" src="/imgs/Logo.png"/></a>
+            <h1 >Gestion de usuarios</h1>
+
+            {% for e in errores%}
+            <p style="color: #f00;">{{e}}</p>
+            {% endfor %}
+
+            {% for us in usuarios %}
+            <div class="Usuario" >
+                <p><strong>Nick:</strong>  {{ us.nombreUsuario }}</p>
+                <p><strong>Nombre completo:</strong> {{ us.nombreCompleto }}</p>
+                <p><strong>Tipo de usuario:</strong> {{ us.tipo }} </p>
+                <form action="" method="post">
+                    <select name="tipoUsuario">
+                        <option selected disabled>Seleccione de tipo de usuario</option>
+                        <option>Moderador</option>
+                        <option>Gestor</option>
+                        <option>Registrado</option>
+                        <option>Super</option>
+                    </select>
+                    <input type="hidden" name="nombreUsuario" value="{{ us.nombreUsuario}}">
+                    <input type="submit" name="submit" value="Cambiar tipo">
+                </form>
+               
+            </div>
+            
+           
+            {% endfor %}
+            <p><a href="./index.php" style="">Volver a la página de inicio</a></p>
+        </div>
+
+    </body>
+</html>

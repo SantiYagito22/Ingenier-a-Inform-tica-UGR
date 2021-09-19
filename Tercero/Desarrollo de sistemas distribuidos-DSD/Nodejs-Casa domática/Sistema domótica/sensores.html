@@ -1,0 +1,119 @@
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Sensores Casa Domática</title>
+        <link href="css/estiloUsuario.css" rel = "stylesheet" type="text/css" />
+	</head>
+	<body>
+
+        <div class="Informacion">
+            <h2>Sensores</h2>
+
+            <form action="javascript:void(0);" onsubmit="javascript:enviarCambio('TEMPERATURA');">
+                <input type="text" id="temperatura" placeholder="Temperatura"/>
+                <input type="submit" value="Enviar Temperatura">
+            </form>
+
+            <form action="javascript:void(0);" onsubmit="javascript:enviarCambio('LUMINOSIDAD');">
+                <input type="text" id="luminosidad" placeholder="Luminosidad"/>
+                <input type="submit" value="Enviar Luminosidad">
+            </form>
+
+
+            <form action="javascript:void(0);" onsubmit="javascript:enviarCambio('HUMEDAD');">
+                <input type="text" id="humedad" placeholder="Humedad"/>
+                <input type="submit" value="Enviar Humedad">
+            </form>
+
+            <form action="javascript:void(0);" onsubmit="javascript:enviarCambio('VIENTO');">
+                <input type="text" id="viento" placeholder="Viento"/>
+                <input type="submit" value="Enviar Viento">
+            </form>
+
+
+            <h4>Usuarios utilizando el sistema</h4>
+            <ul id="listaUsuarios">
+
+            </ul>
+               
+            </div>
+
+           
+
+            
+        </div>
+        
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+	<script type="text/javascript">
+
+        var serviceURL = document.URL;
+	    var socket = io.connect('http://localhost:8080');
+
+
+        //Metodo recibido del form del hmtl por el cual obtienes un nuevo valor de un sensor que es enviado al servidor, si esta vacio no se envia
+        function enviarCambio(cambio)
+        {
+            var fecha=new Date();
+            if(cambio=='TEMPERATURA')
+            {
+                var temperaturaNueva=document.getElementById('temperatura').value;
+                if(temperaturaNueva!="")
+                    socket.emit('cambio-sensor',{cambio:"temperatura",valor: temperaturaNueva, date:fecha});
+            }
+            else if(cambio=='LUMINOSIDAD')
+            {
+                var luminosidadNueva=document.getElementById('luminosidad').value;
+                if(luminosidadNueva!="")
+                    socket.emit('cambio-sensor',{cambio:"luminosidad",valor:luminosidadNueva , date:fecha });
+            }
+            else if(cambio=='HUMEDAD'){
+                var humedadNueva=document.getElementById('humedad').value;
+                if(humedadNueva!="")
+                    socket.emit('cambio-sensor',{cambio:"humedad",valor:humedadNueva , date:fecha });
+            }
+            else if(cambio=='VIENTO'){
+                var vientoNuevo=document.getElementById('viento').value;
+                if(vientoNuevo!="")
+                socket.emit('cambio-sensor',{cambio:"viento",valor:vientoNuevo , date:fecha });
+            }
+            
+        }
+
+        //Escucha al socket que le envia la lista de usuarios activos en el sistema
+
+        socket.on('usuariosSistema',function(data){
+
+            actualizarListaUsuarios(data);
+        });
+
+        //Actualiza en el html, la lista de usuarios activos en el sistema
+        function actualizarListaUsuarios(usuarios)
+        {
+            var listUsuarios= document.getElementById("listaUsuarios");
+        
+            var num = usuarios.length;
+			listUsuarios.innerHTML = '';
+			for(var i=0; i<num; i++) {
+	            var listItem = document.createElement('li');
+                mensajeUsuario=getUsuario(usuarios[i]);
+	            listItem.innerHTML = mensajeUsuario;
+	            listUsuarios.appendChild(listItem);
+	        }
+      
+        }
+
+        //Obtiene de forma  mas legible un mensaje del usuario activo( host, puerto y fecha de acceso)
+        function getUsuario(usuario)
+        {
+            var fecha=new Date();
+            var mensaje="Usuario con host: "+usuario.host+" y puerto: "+usuario.port+" ha accedido al sistema el dia "+fecha.getDate()+" del "+fecha.getMonth()+" a las "+fecha.getHours()+":"+fecha.getMinutes();
+            return mensaje;
+        }
+
+    </script>
+
+
+</html>

@@ -1,0 +1,325 @@
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Usuario</title>
+        <link href="css/estiloUsuario.css" rel = "stylesheet" type="text/css" />
+	</head>
+	<body>
+
+        <div class="Informacion">
+            <h2>Estado de la casa</h2>
+
+            <div class="sensor">
+                <p><strong>Estado Persianas: </strong><span id="estadoPersiana">Persianas subidas</span></p>
+                <button id="cambiarPersiana" value="bajar">Bajar Persianas</button>
+            </div>
+
+            <div class="sensor">
+                <p><strong>Estado Aire Acondicionado: </strong><span id="estadoAire">Aire acondicionado apagado</span></p>
+                <button id="cambiarAire" value="encender">Encender Aire</button>
+            </div>
+
+            <div class="sensor">
+                <p><strong>Estado Aspersores: </strong><span id="estadoAspersor">Aspersores activados</span></p>
+                <button id="cambiarAspersor" value="encender">Activar aspersores</button>
+            </div>
+
+            <div class="sensor">
+                <p><strong>Estado Toldos: </strong><span id="estadoToldo">Toldos subidos</span></p>
+                <button id="cambiarToldo" value="subir">Bajar aspersores</button>
+            </div>
+
+            <p><strong>Temperatura (ºC) de la casa:     </strong><span id="temperatura" style="font-size: x-large; color: red;"></span></p>
+            <p><strong>Luminosidad (%) de la casa:     </strong><span id="luminosidad" style="font-size: x-large; color: red;"></span></p>
+            <p><strong>Humedad jardin:     </strong><span id="humedad" style="font-size: x-large; color: red;"></span></p>
+            <p><strong>Viento:     </strong><span id="viento" style="font-size: x-large; color: red;"></span></p>
+
+
+            <h4>Puede enviar un informe al correo que introduzcas</h4>
+            <div class="sensor">
+                <form action="javascript:void(0);" style="width: 700px;" onsubmit="javascript:enviarCorreo();">
+                    <input type="email" id="correo" placeholder="Correo Electronico"/>
+                    <input type="submit" value="Enviar Informe">
+                </form>
+            </div>
+
+            <p id="confCorreo" style="text-align: center;"></p>
+
+            <h4>Historial de alarmas</h4>
+
+            <ul id="listaAlarmas">
+
+            </ul>
+
+            <button id="borrarHistorial" >Borrar historial</button>
+
+            <button id="cambioAgente" value="apagar">Apagar agente</button>
+            
+        </div>
+        
+
+
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+    
+    //Boton y estado (texto) de la persiana
+    var cambiarPersiana=document.getElementById('cambiarPersiana');
+    var estadoPersiana=document.getElementById('estadoPersiana');
+
+    //Boton y estado (texto) de la persiana
+    var cambiarAire=document.getElementById('cambiarAire');
+    var estadoAire=document.getElementById('estadoAire');
+    
+    //Boton y estado(texto) de los aspersores
+    var cambiarAspersor=document.getElementById('cambiarAspersor');
+    var estadoAspersor=document.getElementById('estadoAspersor');
+
+    //Boton y estado(texto) de los toldos
+    var cambiarToldo=document.getElementById('cambiarToldo');
+    var estadoToldo=document.getElementById('estadoToldo');
+
+    //Temperatura de la casa
+    var temp=document.getElementById('temperatura');
+
+    //Luminosidad de la casa
+    var lum=document.getElementById('luminosidad');
+
+    //Humedad del jardin
+    var hum=document.getElementById('humedad');
+
+    //Viento captado
+    var vient=document.getElementById('viento');
+
+    //Boton de eliminar historial
+    var botonLimpiar=document.getElementById('borrarHistorial');
+
+    //Boton de eliminar historial
+    var botonAgente=document.getElementById('cambioAgente');
+
+    var serviceURL = document.URL;
+	var socket = io.connect('http://localhost:8080');
+
+
+
+    //Escuchamos al socket que nos envie los datos nuevos que se han cambiado, inclusive las alarmas
+
+    socket.on('enviarValores',function(data){
+        temp.innerText=data.temperatura;
+        lum.innerText=data.luminosidad;
+        hum.innerText=data.humedad;
+        vient.innerText=data.viento;
+        cambiarAir(data.aire);
+        cambiarPer(data.persiana);
+        cambiarAg(data.agente);
+        cambiarAsp(data.aspersor);
+        cambiarTold(data.toldo);
+        if(data.alarmas!=null)
+            actualizarListaAlarmas(data.alarmas);
+    });
+
+    //Escuchamos al socket con la orden de vaciar la lista de alarmas
+    socket.on('vaciarLista',function(data){
+        actualizarListaAlarmas(data.alarmas);
+    });
+
+    //Escuchamos al socket que nos envia una confirmacion de que el correo se ha mandado de forma correcta
+    socket.on('confirmar-correo',function(){
+        var confirmacion=document.getElementById('confCorreo');
+        confirmacion.innerText="El correo ha sido enviado con éxito";
+    });
+    
+    //Método que obtiene el correo introducido y lo envia al servidor
+    function enviarCorreo()
+    {
+        
+        var correo=document.getElementById('correo').value;
+        if(correo!="")
+            socket.emit('enviar-correo',{correo:correo});
+    }
+
+    //Funcion no implementada, auqnue funciona en la cual guardo las acciones de los actuadores, pero como no decia que habia que ponerlo no lo he usado
+    
+    function obtenerHistorial(dato){
+
+        if(dato.accion=="bajar")
+        {
+            return "Persianas bajadas el dia "+dato.dia+" del "+dato.mes+" del "+dato.year+" a las "+dato.hora;
+        }
+        else if(dato.accion=="subir")
+        {
+            return "Persianas subidas el dia "+dato.dia+" del "+dato.mes+" del "+dato.year+" a las "+dato.hora;
+        }
+        else if(dato.accion=="apagar")
+        {
+            return "Aire acondicionado apagado el dia "+dato.dia+" del "+dato.mes+" del "+dato.year+" a las "+dato.hora;
+        }
+        else if(dato.accion=="encender")
+        {
+            return "Aire acondicionado encendido el dia "+dato.dia+" del "+dato.mes+" del "+dato.year+" a las "+dato.hora;
+        }
+    }
+    
+    //Funcion que actualiza en el html la lista de alarmas recibidas por el agente del servidor
+
+    function actualizarListaAlarmas(alarmas)
+    {
+        var listAlarmas= document.getElementById("listaAlarmas");
+        
+			listAlarmas.innerHTML = '';
+			var num = alarmas.length;
+			for(var i=0; i<num; i++) {
+	            var listItem = document.createElement('li');
+	            listItem.innerHTML = alarmas[i];
+	            listAlarmas.appendChild(listItem);
+	        }
+      
+    }
+
+
+    //Funcion que cambia los textos y valores sobre el estado del toldo en el html
+    function cambiarTold(value)
+    {
+        if(value=="subir")
+        {
+            cambiarToldo.innerText="Bajar Toldos";
+            cambiarToldo.value="bajar";
+            estadoToldo.innerText="Toldos subidos";
+        }
+        else{
+            cambiarToldo.innerText="Subir Toldos";
+            cambiarToldo.value="subir";
+            estadoToldo.innerText="Toldos bajados";
+        }
+    }
+
+    //Funcion declarada para que cuando pulsemos el boton del toldo llamemos al metodo cambiarTold y enviemos esa accion al servidor 
+    cambiarToldo.onclick = function (){
+        var accionToldo=document.getElementById("cambiarToldo").value;
+        socket.emit('accion-toldo',{accion:accionToldo});
+        cambiarAsp(accionToldo);
+    }
+
+    //Funcion que cambia los textos y valores sobre el estado de los aspersores en el html
+
+    function cambiarAsp(value)
+    {
+        if(value=="encender")
+        {
+            cambiarAspersor.innerText="Apagar aspersores";
+            cambiarAspersor.value="apagar";
+            estadoAspersor.innerText="Aspersores activados";
+        }
+        else{
+            cambiarAspersor.innerText="Encender aspersores";
+            cambiarAspersor.value="encender";
+            estadoAspersor.innerText="Aspersores desactivados";
+        }
+    }
+
+    //Funcion declarada para que cuando pulsemos el boton del Aspersor llamemos al metodo cambiarAsp y enviemos esa accion al servidor 
+    cambiarAspersor.onclick = function(){
+        var accionAspersor=document.getElementById("cambiarAspersor").value;
+        socket.emit('accion-aspersor',{accion:accionAspersor});
+        cambiarAsp(accionAspersor);
+    }
+
+    //Funcion que cambia los textos y valores sobre el estado del aire acondicionado en el html
+    function cambiarAir(value)
+    {
+
+        if(value == "encender")
+        {
+            cambiarAire.innerText="Apagar Aire";
+            cambiarAire.value= "apagar";
+            estadoAire.innerText="Aire acondicionado encendido";
+        }
+        else{
+            cambiarAire.innerText="Encender Aire";
+            cambiarAire.value= "encender";
+            estadoAire.innerText="Aire acondicionado apagado";
+        }
+    }
+
+    //Funcion declarada para que cuando pulsemos el boton del aire llamemos al metodo cambiarAir y enviemos esa accion al servidor 
+    cambiarAire.onclick = function() {
+       
+        var accionAire=document.getElementById("cambiarAire").value;
+        socket.emit('accion-aire', {accion:accionAire });
+        cambiarAir(accionAire);
+
+    }
+
+    //Funcion que cambia los textos y valores sobre el estado de las persianas en el html
+    function cambiarPer(value)
+    {
+        if(value == "bajar")
+        {
+            cambiarPersiana.innerText="Subir Persianas";
+            cambiarPersiana.value= "subir";
+            estadoPersiana.innerText="Persianas bajadas";
+        }
+        else{
+            cambiarPersiana.innerText="Bajar Persianas";
+            cambiarPersiana.value= "bajar";
+            estadoPersiana.innerText="Persianas subidas";
+        }
+    }
+
+    //Funcion declarada para que cuando pulsemos el boton de la persiana llamemos al metodo cambiarPer y enviemos esa accion al servidor 
+    cambiarPersiana.onclick = function(){
+
+        /*
+        var fecha=new Date();
+        var dia=fecha.getDay();
+        var mes=fecha.getMonth();
+        var año=fecha.getFullYear();
+        var h=fecha.getHours()+":"+fecha.getMinutes();
+        */
+
+        var accionPersiana=document.getElementById("cambiarPersiana").value;
+
+        socket.emit('accion-persiana', {accion:accionPersiana});
+        
+        cambiarPer(accionPersiana);
+        
+    }
+
+    //Funcion declarada para que cuando pulsemos el boton de limpiar enviemos al servidor la accion de borrar el historial de alarmas
+
+    botonLimpiar.onclick = function(){
+        socket.emit('eliminar-historial',{});
+    }
+
+    //Funcion que cambia los textos y valores sobre el estado del agente en el html
+    function cambiarAg(value)
+    {
+        if(value == "apagar")
+        {
+            botonAgente.innerText="Encender Agente";
+            botonAgente.value= "encender";
+            
+        }
+        else{
+            botonAgente.innerText="Apagar Agente";
+            botonAgente.value= "apagar";
+        }
+    }
+
+    //Funcion declarada para que cuando pulsemos el boton del agente llamemos al metodo cambiarAg y enviemos esa accion al servidor
+
+    botonAgente.onclick = function()
+    {
+        var accionAgente=document.getElementById("cambioAgente").value;
+        
+        socket.emit('accion-agente', {accion:accionAgente});
+
+        cambiarAg(accionAgente);
+    }
+
+    </script>
+
+    
+</html>
