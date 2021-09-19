@@ -1,0 +1,59 @@
+<html lang="es" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Crear Evento</title>
+        <link href="css/crearEvento.css" rel = "stylesheet" type="text/css" />
+    </head>
+    <body>
+        
+        <form class="box" action="" method="post" enctype="multipart/form-data">
+            <h2>Modificar evento</h2>
+            <div class="datosInicio">
+                <input type="text" name="nombreEvento" placeholder="Nombre del evento" value="{{ eventoInicio.tipo }}">
+                <input type="text" name="minDescp" placeholder="Breve descripcion introductoria" value="{{ eventoInicio.introduccion }}" style="width: 300px;">
+                <label for="imagenInicio">Selecciona imagen de inicio:</label>
+                <input type="file" id="imagenInicio" name="fotoEvent">
+            </div>
+            <div class="datosEvento">
+                <input type="text" name="titular" placeholder="Portada del evento" value="{{ evento.nombre }}">
+                <input type="text" name="esloganEvento" placeholder="Eslogan del evento" value="{{ evento.eslogan }}" style="width: 300px;">
+                <label for="fecha">Elige fecha del evento:</label>
+                <input type="date" id="fecha" name="fechaEvento" value="{{ evento.fecha }}" >
+            </div>
+            <h4>Descripcion del evento:</h4>
+            <textarea type="text" name="descripcion" class="descripcion" placeholder="Descripcion del evento">{{ evento.descripcion }}</textarea>
+            <div class="etiquetas">
+                <input type="text" name="Etiqueta1" placeholder="Etiqueta 1" value={{etiquetas[0].tipo}}>
+                <input type="text" name="Etiqueta2" placeholder="Etiqueta 2" value="{{etiquetas[1].tipo}}">
+                <input type="text" name="Etiqueta3" placeholder="Etiqueta 3" value="{{etiquetas[2].tipo}}">
+                <input type="text" name="Etiqueta4" placeholder="Etiqueta 4" value="{{etiquetas[3].tipo}}">
+                <input type="text" name="Etiqueta5" placeholder="Etiqueta 5" value="{{etiquetas[4].tipo}}">
+                <input type="text" name="Etiqueta6" placeholder="Etiqueta 6" value="{{etiquetas[5].tipo}}">
+            </div>
+            <h4>Galería de imágenes (introducir minimo una):</h4>
+            <div class="galeria1">
+                {% for i in 0..5 %}
+                <div id="FormImagen">
+                    <input type="text" name="nombreProducto{{ i }}" placeholder="Nombre del producto {{ i }}" value="{{ galeria[ i ].tipo }}">
+                    <input type="text" name="descProducto{{ i }}" placeholder="Descripcion breve " value="{{ galeria[ i ].descripcion }}">
+                    <input type="file" id="imagenGaleria{{ i }}" name="foto{{i}}">
+                </div>
+                {% endfor %}
+                
+
+            </div>
+            
+            
+
+        {% for e in errores%}
+        <p style="color: #f00;">{{e}}</p>
+        {% endfor %}
+        
+        <input type="submit" value="Modificar Evento">
+        <a href="./index.php">Volver a la página de inicio</a></p>
+        </form>
+
+
+
+    </body>
+</html>

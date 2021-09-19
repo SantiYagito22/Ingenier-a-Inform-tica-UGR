@@ -1,0 +1,17 @@
+{% extends "identificacion.html" %}
+
+{% block formulario %}
+<form class="box" action="modificar.php" method="post">
+<a href="./index.php"><img class="logo" src="/imgs/Logo.png"/></a>
+<h2>Modifica uno de los datos posibles</h2>
+<p><strong>Nombre Completo</strong> <input type="text" name="nombreCompleto" placeholder="Nombre completo" value="{{ datosUsuario.nombreCompleto }}"> </p>
+<p><strong>Correo</strong><input type="email" name="correo" placeholder="Correo electronico" value="{{ datosUsuario.correo }}"></p>
+<p><strong>Nick</strong><input type="text" name="usuario" placeholder="Nombre de usuario" value="{{ datosUsuario.nombreUsuario }}"></p>
+<p><strong>Contraseña</strong><input type="password" name="password" placeholder="Contraseña..." ></p>
+{% for e in errores%}
+<p style="color: #f00;">{{e}}</p>
+{% endfor %}
+<input type="submit" value="Modificar">
+<a href="./index.php">Volver a la página de inicio</a></p>
+</form>
+{% endblock %}
